@@ -1,12 +1,14 @@
-'use client';
+"use client";
 
-import { useState, useRef } from 'react';
+import { useState, useRef } from "react";
+import { useRouter } from "next/navigation";
 
 interface FileUploadProps {
   onFileSelect: (file: File) => void;
 }
 
 export default function FileUpload({ onFileSelect }: FileUploadProps) {
+  const router = useRouter();
   const [isDragging, setIsDragging] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isUploaded, setIsUploaded] = useState(false);
@@ -24,9 +26,9 @@ export default function FileUpload({ onFileSelect }: FileUploadProps) {
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
-    
+
     const files = e.dataTransfer.files;
-    if (files.length > 0 && files[0].name.endsWith('.csv')) {
+    if (files.length > 0 && files[0].name.endsWith(".csv")) {
       setSelectedFile(files[0]);
       onFileSelect(files[0]);
       setTimeout(() => setIsUploaded(true), 300);
@@ -49,31 +51,45 @@ export default function FileUpload({ onFileSelect }: FileUploadProps) {
   };
 
   const handleContinue = () => {
-    console.log('Continue to analysis with file:', selectedFile?.name);
-    // Add your analysis navigation logic here
+    console.log("Continue to analysis with file:", selectedFile?.name);
+    router.push("/analysis");
   };
 
   const handleRemoveFile = () => {
     setSelectedFile(null);
     setIsUploaded(false);
     if (fileInputRef.current) {
-      fileInputRef.current.value = '';
+      fileInputRef.current.value = "";
     }
   };
 
   const handleChangeFile = () => {
     if (fileInputRef.current) {
-      fileInputRef.current.value = '';
+      fileInputRef.current.value = "";
       fileInputRef.current.click();
     }
   };
 
   const formatFileSize = (bytes: number): string => {
-    if (bytes === 0) return '0 Bytes';
+    if (bytes === 0) return "0 Bytes";
     const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const sizes = ["Bytes", "KB", "MB", "GB"];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i];
+    return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + " " + sizes[i];
+  };
+
+  const downloadCSV = async () => {
+    const response = await fetch("/api/download-template");
+    const blob = await response.blob();
+
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "battery_log_template.csv";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.URL.revokeObjectURL(url);
   };
 
   return (
@@ -86,7 +102,7 @@ export default function FileUpload({ onFileSelect }: FileUploadProps) {
         onChange={handleFileChange}
         className="hidden"
       />
-      
+
       <div className="bg-indigo-950/60 backdrop-blur-lg border-2 border-dashed border-purple-400/30 rounded-3xl p-12 text-center relative overflow-hidden transition-all duration-400">
         {!isUploaded ? (
           <div
@@ -96,7 +112,11 @@ export default function FileUpload({ onFileSelect }: FileUploadProps) {
             onDrop={handleDrop}
             onClick={handleClick}
           >
-            <div className={`text-purple-300 mb-6 flex justify-center transition-transform duration-300 ${isDragging ? 'animate-[customPulse_1s_infinite] scale-110' : ''}`}>
+            <div
+              className={`text-purple-300 mb-6 flex justify-center transition-transform duration-300 ${
+                isDragging ? "animate-[customPulse_1s_infinite] scale-110" : ""
+              }`}
+            >
               <svg
                 width="48"
                 height="48"
@@ -123,9 +143,7 @@ export default function FileUpload({ onFileSelect }: FileUploadProps) {
               <p className="text-xl font-semibold text-white mb-2">
                 Drop your CSV file here
               </p>
-              <p className="text-purple-200 text-base">
-                or click to browse
-              </p>
+              <p className="text-purple-200 text-base">or click to browse</p>
             </div>
           </div>
         ) : (
@@ -271,7 +289,10 @@ export default function FileUpload({ onFileSelect }: FileUploadProps) {
       )}
 
       {/* Download Template Button - Always visible */}
-      <button className="inline-flex items-center gap-2 px-6 py-3 bg-purple-300/15 text-purple-200 border border-purple-400/30 rounded-full text-[0.95rem] font-medium cursor-pointer mt-6 transition-all duration-300 hover:bg-purple-300/25 hover:text-white hover:border-purple-400/50 hover:-translate-y-0.5">
+      <button
+        className="inline-flex items-center gap-2 px-6 py-3 bg-purple-300/15 text-purple-200 border border-purple-400/30 rounded-full text-[0.95rem] font-medium cursor-pointer mt-6 transition-all duration-300 hover:bg-purple-300/25 hover:text-white hover:border-purple-400/50 hover:-translate-y-0.5"
+        onClick={downloadCSV}
+      >
         <svg
           width="16"
           height="16"
@@ -295,7 +316,9 @@ export default function FileUpload({ onFileSelect }: FileUploadProps) {
         </svg>
         Download CSV Template
       </button>
-      <p className="text-slate-400 text-sm mt-4 text-center">CSV format: timestamp, voltage, current, temperature</p>
+      <p className="text-slate-400 text-sm mt-4 text-center">
+        CSV format: timestamp, voltage, current, temperature
+      </p>
     </div>
   );
 }
