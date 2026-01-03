@@ -8,7 +8,6 @@ import FileUpload from './components/FileUpload';
 export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isToastVisible, setIsToastVisible] = useState(false);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const handleDownloadClick = () => {
     setIsModalOpen(true);
@@ -21,11 +20,6 @@ export default function Home() {
     setTimeout(() => {
       console.log('APK download started');
     }, 100);
-  };
-
-  const handleFileSelect = (file: File) => {
-    setSelectedFile(file);
-    console.log('File selected:', file.name);
   };
 
   return (
@@ -151,7 +145,7 @@ export default function Home() {
           </div>
         </section>
 
-        <FileUpload onFileSelect={handleFileSelect} />
+        <FileUpload />
       </main>
     </div>
   );

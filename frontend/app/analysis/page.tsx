@@ -18,7 +18,11 @@ export default function AnalysisPage() {
   const [chartData, setChartData] = useState<any[]>([]);
 
   useEffect(() => {
-    if (!file) return;
+    if (!file) {
+      // Redirect to home page if no file is uploaded
+      router.push("/");
+      return;
+    }
 
     const parseCSVForChart = async (file: File) => {
   const text = await file.text();
@@ -122,8 +126,8 @@ export default function AnalysisPage() {
         </div>
 
         <button
-          onClick={() => router.push("/")}
-          className="flex items-center gap-2 px-6 py-3 bg-purple-500/20 text-purple-200 border border-purple-400/30 rounded-full text-sm font-medium cursor-pointer transition-all duration-300 hover:bg-purple-500/30 hover:text-white hover:border-purple-400/50"
+          onClick={() => window.print()}
+          className="no-print flex items-center gap-2 px-6 py-3 bg-purple-500/20 text-purple-200 border border-purple-400/30 rounded-full text-sm font-medium transition-all duration-300 hover:bg-purple-500/30 hover:text-white hover:border-purple-400/50"
         >
           <svg
             width="16"
@@ -190,16 +194,16 @@ export default function AnalysisPage() {
           <BatteryChart
             data={chartData}
             voltageRange={{
-              min: Math.min(...chartData.map((d) => d.voltage_v)),
-              max: Math.max(...chartData.map((d) => d.voltage_v)),
+              min: Math.min(...chartData.map((d) => d.voltage)),
+              max: Math.max(...chartData.map((d) => d.voltage)),
             }}
             currentRange={{
-              min: Math.min(...chartData.map((d) => d.current_ma)),
-              max: Math.max(...chartData.map((d) => d.current_ma)),
+              min: Math.min(...chartData.map((d) => d.current)),
+              max: Math.max(...chartData.map((d) => d.current)),
             }}
             temperatureRange={{
-              min: Math.min(...chartData.map((d) => d.temperature_c)),
-              max: Math.max(...chartData.map((d) => d.temperature_c)),
+              min: Math.min(...chartData.map((d) => d.temperature)),
+              max: Math.max(...chartData.map((d) => d.temperature)),
             }}
           />
         )}
