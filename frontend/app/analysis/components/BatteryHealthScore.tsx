@@ -23,12 +23,12 @@ export default function BatteryHealthScore({ score, status }: BatteryHealthScore
   const offset = circumference - (score / 100) * circumference;
 
   return (
-    <div className="bg-gradient-to-br from-indigo-950/80 to-purple-950/80 backdrop-blur-lg border border-purple-400/20 rounded-3xl p-8 animate-[scaleIn_0.6s_ease-out]">
-      <h2 className="text-2xl font-semibold text-white mb-8 text-center">
+    <div className="bg-gradient-to-br from-indigo-950/80 to-purple-950/80 backdrop-blur-lg border border-purple-400/20 rounded-3xl p-6 animate-[scaleIn_0.6s_ease-out]">
+      <h2 className="text-xl font-semibold text-white mb-6 text-center">
         Battery Health Score
       </h2>
       
-      <div className="relative w-80 h-80 mx-auto mb-6">
+      <div className="relative w-56 h-56 mx-auto mb-4">
         {/* Background gradient blur effect */}
         <div className="absolute inset-0 bg-gradient-to-br from-orange-500/20 via-amber-500/20 to-yellow-500/20 rounded-full blur-3xl"></div>
         
@@ -70,23 +70,23 @@ export default function BatteryHealthScore({ score, status }: BatteryHealthScore
         
         {/* Center content */}
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <div className="text-8xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-orange-400 to-amber-500 mb-2">
+          <div className="text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-orange-400 to-amber-500 mb-2">
             {score}%
           </div>
-          <div className={`text-2xl font-medium ${getStatusColor()}`}>
+          <div className={`text-xl font-medium ${getStatusColor()}`}>
             {status}
           </div>
         </div>
       </div>
       
       {/* Status bar */}
-      <div className="mt-8">
-        <div className="flex justify-between items-center text-sm text-purple-200 mb-2">
+      <div className="mt-6">
+        <div className="flex justify-between items-center text-xs text-purple-200 mb-2">
           <span>Critical</span>
           <span>Fair</span>
           <span>Excellent</span>
         </div>
-        <div className="h-2 bg-gradient-to-r from-red-500 via-yellow-500 to-green-500 rounded-full"></div>
+        <div className="h-1.5 bg-gradient-to-r from-red-500 via-yellow-500 to-green-500 rounded-full"></div>
       </div>
     </div>
   );

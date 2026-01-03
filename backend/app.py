@@ -114,7 +114,13 @@ def predict_from_csv():
 
     return jsonify({
         "predicted_battery_health": round(float(prediction), 2),
-        "battery_status": status
+        "battery_status": status,
+
+        "averages": {
+            "avg_voltage": round(base_features["voltage_mean"], 3),
+            "avg_current": round(base_features["current_mean"], 3),
+            "avg_temperature": round(base_features["temp_mean"], 2)
+        }
     })
 
 
