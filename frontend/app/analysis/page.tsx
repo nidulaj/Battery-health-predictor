@@ -1,62 +1,90 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import { useBattery } from "@/app/context/BatteryContext";
 import { useRouter } from "next/navigation";
 import BatteryHealthScore from "./components/BatteryHealthScore";
 import MetricsCard from "./components/MetricsCard";
 import BatteryChart from "./components/BatteryChart";
 
-// Generate dummy data for 50 data points
-const generateDummyData = () => {
-  const data = [];
-  const baseTime = new Date("2024-01-01T22:44:16");
-  
-  for (let i = 0; i < 50; i++) {
-    const time = new Date(baseTime.getTime() + i * 30000); // 30 seconds intervals
-    const hours = time.getHours().toString().padStart(2, "0");
-    const minutes = time.getMinutes().toString().padStart(2, "0");
-    const seconds = time.getSeconds().toString().padStart(2, "0");
-    
-    data.push({
-      timestamp: `${hours}:${minutes}:${seconds}`,
-      voltage: 3.54 + Math.random() * (4.15 - 3.54),
-      current: 1.15 + Math.random() * (2.47 - 1.15),
-      temperature: 21.0 + Math.random() * (33.7 - 21.0),
-    });
-  }
-  
-  return data;
-};
-
 export default function AnalysisPage() {
   const router = useRouter();
-  const dummyData = generateDummyData();
-  
-  // Calculate averages
-  const avgVoltage = dummyData.reduce((sum, d) => sum + d.voltage, 0) / dummyData.length;
-  const avgCurrent = dummyData.reduce((sum, d) => sum + d.current, 0) / dummyData.length;
-  const avgTemperature = dummyData.reduce((sum, d) => sum + d.temperature, 0) / dummyData.length;
-  
-  // Calculate ranges
-  const voltageRange = {
-    min: Math.min(...dummyData.map((d) => d.voltage)),
-    max: Math.max(...dummyData.map((d) => d.voltage)),
-  };
-  
-  const currentRange = {
-    min: Math.min(...dummyData.map((d) => d.current)),
-    max: Math.max(...dummyData.map((d) => d.current)),
-  };
-  
-  const temperatureRange = {
-    min: Math.min(...dummyData.map((d) => d.temperature)),
-    max: Math.max(...dummyData.map((d) => d.temperature)),
-  };
+  const { file } = useBattery();
+
+  const [loading, setLoading] = useState(true);
+  const [health, setHealth] = useState<number | null>(null);
+  const [status, setStatus] = useState<string>("");
+  const [metrics, setMetrics] = useState<any>(null);
+  const [chartData, setChartData] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (!file) return;
+
+    const parseCSVForChart = async (file: File) => {
+  const text = await file.text();
+  const lines = text.split("\n").slice(1);
+
+  return lines
+    .filter(line => line.trim() !== "") // 🚀 removes empty last row
+    .map(line => {
+      const [timestamp, voltage_v, current_ma, temperature_c] = line.split(",");
+
+      return {
+        timestamp,
+        voltage: Number(voltage_v),
+        current: Number(current_ma),
+        temperature: Number(temperature_c),
+      };
+    });
+};
+
+
+    const run = async () => {
+      setLoading(true);
+
+      // --- Backend prediction ---
+      const formData = new FormData();
+      formData.append("file", file);
+      console.log("Uploading file for prediction:", file.name);
+
+      const res = await fetch("http://localhost:5000/predict_csv", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+      console.log("Prediction data:", data);
+
+      setHealth(data.predicted_battery_health);
+      setStatus(data.battery_status);
+      setMetrics(data.averages);
+
+      // --- CSV parsing for chart ---
+      const parsed = await parseCSVForChart(file);
+      console.log("Parsed CSV Data:", parsed);
+      setChartData(parsed);
+
+      setLoading(false);
+    };
+
+    run();
+
+  }, [file]);
+
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-white text-xl">
+        Analyzing battery data...
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-950 via-purple-900 to-purple-900 relative overflow-x-hidden">
       {/* Header */}
       <header className="flex flex-col md:flex-row justify-between items-center p-6 md:p-8 relative z-10 animate-[slideDown_0.6s_ease-out] gap-4">
-        <div 
+        <div
           className="flex items-center gap-3 text-white text-xl font-semibold cursor-pointer transition-transform duration-300 hover:scale-105"
           onClick={() => router.push("/")}
         >
@@ -77,12 +105,22 @@ export default function AnalysisPage() {
               stroke="currentColor"
               strokeWidth="2"
             />
-            <path d="M10 2H14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-            <path d="M9 12H15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+            <path
+              d="M10 2H14"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+            />
+            <path
+              d="M9 12H15"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+            />
           </svg>
           <span>BatteryHealth AI</span>
         </div>
-        
+
         <button
           onClick={() => router.push("/")}
           className="flex items-center gap-2 px-6 py-3 bg-purple-500/20 text-purple-200 border border-purple-400/30 rounded-full text-sm font-medium cursor-pointer transition-all duration-300 hover:bg-purple-500/30 hover:text-white hover:border-purple-400/50"
@@ -95,14 +133,20 @@ export default function AnalysisPage() {
             xmlns="http://www.w3.org/2000/svg"
           >
             <path
-              d="M12 8H4M4 8L8 12M4 8L8 4"
+              d="M8 2V10M8 10L5 7M8 10L11 7"
               stroke="currentColor"
               strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"
             />
+            <path
+              d="M2 14H14"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+            />
           </svg>
-          New Analysis
+          Download
         </button>
       </header>
 
@@ -111,27 +155,29 @@ export default function AnalysisPage() {
         {/* Top Section: Health Score and Metrics */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
           {/* Battery Health Score */}
-          <BatteryHealthScore score={68} status="Fair" />
-          
+          {health !== null && (
+            <BatteryHealthScore score={Math.round(health)} status={status} />
+          )}
+
           {/* Metrics Cards */}
           <div className="grid grid-cols-1 gap-6">
             <MetricsCard
               title="Average Voltage"
-              value={avgVoltage}
+              value={metrics?.avg_voltage}
               unit="V"
               icon="voltage"
               gradient="from-purple-950/80 to-fuchsia-950/80"
             />
             <MetricsCard
               title="Average Current"
-              value={avgCurrent}
+              value={metrics?.avg_current}
               unit="A"
               icon="current"
               gradient="from-indigo-950/80 to-blue-950/80"
             />
             <MetricsCard
               title="Average Temperature"
-              value={avgTemperature}
+              value={metrics?.avg_temperature}
               unit="°C"
               icon="temperature"
               gradient="from-orange-950/80 to-amber-950/80"
@@ -140,12 +186,23 @@ export default function AnalysisPage() {
         </div>
 
         {/* Chart Section */}
-        <BatteryChart
-          data={dummyData}
-          voltageRange={voltageRange}
-          currentRange={currentRange}
-          temperatureRange={temperatureRange}
-        />
+        {chartData.length > 0 && (
+          <BatteryChart
+            data={chartData}
+            voltageRange={{
+              min: Math.min(...chartData.map((d) => d.voltage_v)),
+              max: Math.max(...chartData.map((d) => d.voltage_v)),
+            }}
+            currentRange={{
+              min: Math.min(...chartData.map((d) => d.current_ma)),
+              max: Math.max(...chartData.map((d) => d.current_ma)),
+            }}
+            temperatureRange={{
+              min: Math.min(...chartData.map((d) => d.temperature_c)),
+              max: Math.max(...chartData.map((d) => d.temperature_c)),
+            }}
+          />
+        )}
 
         {/* Health Analysis Summary */}
         <div className="mt-8 bg-gradient-to-br from-indigo-950/80 to-purple-950/80 backdrop-blur-lg border border-purple-400/20 rounded-3xl p-8 animate-[scaleIn_0.6s_ease-out_0.3s]">
@@ -175,47 +232,24 @@ export default function AnalysisPage() {
                 strokeLinejoin="round"
               />
             </svg>
-            <h2 className="text-2xl font-semibold text-white">Health Analysis Summary</h2>
+            <h2 className="text-2xl font-semibold text-white">
+              Health Analysis Summary
+            </h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
-              <p className="text-purple-300 text-sm mb-2">Data Points Analyzed</p>
-              <p className="text-5xl font-bold text-white">{dummyData.length}</p>
+              <p className="text-purple-300 text-sm mb-2">
+                Data Points Analyzed
+              </p>
+              <p className="text-3xl font-bold text-white">
+                {chartData.length}
+              </p>
             </div>
             <div>
               <p className="text-purple-300 text-sm mb-2">Health Assessment</p>
-              <p className="text-5xl font-bold text-yellow-400">Fair</p>
+              <p className="text-3xl font-bold text-yellow-400">{status}</p>
             </div>
-          </div>
-
-          <div className="mt-8 bg-yellow-500/10 border border-yellow-500/30 rounded-2xl p-6 flex items-start gap-4">
-            <svg
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              className="text-yellow-400 flex-shrink-0 mt-1"
-            >
-              <path
-                d="M12 2L2 22H22L12 2Z"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M12 9V13"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-              />
-              <circle cx="12" cy="17" r="1" fill="currentColor" />
-            </svg>
-            <p className="text-yellow-100 text-base leading-relaxed">
-              Your battery shows moderate wear. Consider optimizing charging patterns.
-            </p>
           </div>
         </div>
       </main>

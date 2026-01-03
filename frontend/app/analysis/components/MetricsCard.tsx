@@ -100,28 +100,28 @@ export default function MetricsCard({ title, value, unit, icon, gradient }: Metr
 
   return (
     <div
-      className={`bg-gradient-to-br ${gradient} backdrop-blur-lg border border-purple-400/20 rounded-2xl p-6 relative overflow-hidden animate-[scaleIn_0.6s_ease-out] transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl`}
+      className={`bg-gradient-to-br ${gradient} backdrop-blur-lg border border-purple-400/20 rounded-2xl p-4 relative overflow-hidden animate-[scaleIn_0.6s_ease-out] transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl`}
       style={{
         boxShadow: `0 8px 32px ${getGlowColor()}`,
       }}
     >
       {/* Decorative dot */}
-      <div className="absolute top-4 right-4">
-        <div className={`w-2 h-2 rounded-full bg-${icon === 'voltage' ? 'pink' : icon === 'current' ? 'blue' : 'orange'}-400 animate-pulse`}></div>
+      <div className="absolute top-3 right-3">
+        <div className={`w-1.5 h-1.5 rounded-full bg-${icon === 'voltage' ? 'pink' : icon === 'current' ? 'blue' : 'orange'}-400 animate-pulse`}></div>
       </div>
 
       {/* Icon */}
-      <div className="mb-4 w-12 h-12 flex items-center justify-center">
+      <div className="mb-3 w-8 h-8 flex items-center justify-center">
         {getIcon()}
       </div>
 
       {/* Title */}
-      <h3 className="text-purple-200 text-sm font-medium mb-2">{title}</h3>
+      <h3 className="text-purple-200 text-xs font-medium mb-1">{title}</h3>
 
       {/* Value */}
       <div className="flex items-baseline gap-1">
-        <span className="text-5xl font-bold text-white">{value.toFixed(2)}</span>
-        <span className="text-2xl font-semibold text-purple-200">{unit}</span>
+        <span className="text-3xl font-bold text-white">{value.toFixed(2)}</span>
+        <span className="text-lg font-semibold text-purple-200">{unit}</span>
       </div>
 
       {/* Decorative bottom border gradient */}

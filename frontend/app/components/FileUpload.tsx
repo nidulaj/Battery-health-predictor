@@ -2,17 +2,16 @@
 
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { useBattery } from "@/app/context/BatteryContext";
 
-interface FileUploadProps {
-  onFileSelect: (file: File) => void;
-}
-
-export default function FileUpload({ onFileSelect }: FileUploadProps) {
+export default function FileUpload() {
   const router = useRouter();
   const [isDragging, setIsDragging] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isUploaded, setIsUploaded] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const { setFile } = useBattery();
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -30,19 +29,28 @@ export default function FileUpload({ onFileSelect }: FileUploadProps) {
     const files = e.dataTransfer.files;
     if (files.length > 0 && files[0].name.endsWith(".csv")) {
       setSelectedFile(files[0]);
-      onFileSelect(files[0]);
+      setFile(files[0]);
       setTimeout(() => setIsUploaded(true), 300);
     }
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (files && files.length > 0) {
-      setSelectedFile(files[0]);
-      onFileSelect(files[0]);
-      setTimeout(() => setIsUploaded(true), 300);
-    }
-  };
+const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const files = e.target.files;
+  if (!files || files.length === 0) return;
+
+  const file = files[0];
+
+  if (!file.name.toLowerCase().endsWith(".csv")) {
+    alert("Please upload a CSV file only");
+    e.target.value = "";
+    return;
+  }
+
+  setSelectedFile(file);
+  setFile(file);
+  setTimeout(() => setIsUploaded(true), 300);
+};
+
 
   const handleClick = () => {
     if (!isUploaded) {
