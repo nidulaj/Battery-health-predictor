@@ -9,6 +9,7 @@ export default function FileUpload() {
   const [isDragging, setIsDragging] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isUploaded, setIsUploaded] = useState(false);
+  const [isNavigating, setIsNavigating] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { setFile } = useBattery();
@@ -60,6 +61,7 @@ const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 
   const handleContinue = () => {
     console.log("Continue to analysis with file:", selectedFile?.name);
+    setIsNavigating(true);
     router.push("/analysis");
   };
 
@@ -102,6 +104,58 @@ const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 
   return (
     <div className="max-w-3xl mx-auto animate-[scaleIn_0.8s_ease-out_0.4s_both]">
+      {/* Loading Overlay */}
+      {isNavigating && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-indigo-950 via-purple-900 to-purple-900">
+          <div className="flex flex-col items-center gap-6">
+            {/* Animated Battery Loading Icon */}
+            <div className="relative">
+              <svg
+                width="80"
+                height="80"
+                viewBox="0 0 80 80"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                className="animate-pulse"
+              >
+                <rect
+                  x="20"
+                  y="15"
+                  width="40"
+                  height="50"
+                  rx="4"
+                  stroke="#8b5cf6"
+                  strokeWidth="3"
+                />
+                <rect x="35" y="8" width="10" height="4" rx="2" fill="#a78bfa" />
+                <rect x="25" y="25" width="30" height="8" rx="2" fill="#8b5cf6" className="animate-pulse">
+                  <animate attributeName="opacity" values="0.3;1;0.3" dur="1.5s" repeatCount="indefinite" />
+                </rect>
+                <rect x="25" y="38" width="30" height="8" rx="2" fill="#a78bfa" className="animate-pulse">
+                  <animate attributeName="opacity" values="0.3;1;0.3" dur="1.5s" begin="0.3s" repeatCount="indefinite" />
+                </rect>
+                <rect x="25" y="51" width="30" height="8" rx="2" fill="#c4b5fd" className="animate-pulse">
+                  <animate attributeName="opacity" values="0.3;1;0.3" dur="1.5s" begin="0.6s" repeatCount="indefinite" />
+                </rect>
+              </svg>
+            </div>
+            
+            {/* Loading Text */}
+            <div className="text-center">
+              <h3 className="text-2xl font-bold text-white mb-2">Preparing Analysis</h3>
+              <p className="text-purple-200">Loading your battery data...</p>
+            </div>
+            
+            {/* Loading Spinner */}
+            <div className="flex gap-2">
+              <div className="w-3 h-3 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: '0s' }}></div>
+              <div className="w-3 h-3 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+              <div className="w-3 h-3 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }}></div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Hidden File Input - Always present */}
       <input
         ref={fileInputRef}

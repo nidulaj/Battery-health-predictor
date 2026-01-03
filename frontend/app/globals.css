@@ -65,4 +65,40 @@ body {
   margin: 0;
   padding: 0;
 }
+@media print {
+
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+
+  /* Hide buttons & navigation */
+  .no-print {
+    display: none !important;
+  }
+
+
+  /* Fix charts */
+  canvas,
+  svg {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+
+  body {
+    background: linear-gradient(
+      to bottom right,
+      rgb(30, 27, 75),
+      rgb(88, 28, 135),
+      rgb(88, 28, 135)
+    ) !important;
+  }
+}
+
+@page {
+  size: A4 landscape;
+  margin: 12mm;
+}
+
 
