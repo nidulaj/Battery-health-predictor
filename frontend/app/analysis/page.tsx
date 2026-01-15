@@ -25,23 +25,23 @@ export default function AnalysisPage() {
     }
 
     const parseCSVForChart = async (file: File) => {
-  const text = await file.text();
-  const lines = text.split("\n").slice(1);
+      const text = await file.text();
+      const lines = text.split("\n").slice(1);
 
-  return lines
-    .filter(line => line.trim() !== "") // 🚀 removes empty last row
-    .map(line => {
-      const [timestamp, voltage_v, current_ma, temperature_c] = line.split(",");
+      return lines
+        .filter((line) => line.trim() !== "") // 🚀 removes empty last row
+        .map((line) => {
+          const [timestamp, voltage_v, current_ma, temperature_c] =
+            line.split(",");
 
-      return {
-        timestamp,
-        voltage: Number(voltage_v),
-        current: Number(current_ma),
-        temperature: Number(temperature_c),
-      };
-    });
-};
-
+          return {
+            timestamp,
+            voltage: Number(voltage_v),
+            current: Number(current_ma),
+            temperature: Number(temperature_c),
+          };
+        });
+    };
 
     const run = async () => {
       setLoading(true);
@@ -51,7 +51,7 @@ export default function AnalysisPage() {
       formData.append("file", file);
       console.log("Uploading file for prediction:", file.name);
 
-      const res = await fetch("http://localhost:5000/predict_csv", {
+      const res = await fetch("/api/predict", {
         method: "POST",
         body: formData,
       });
@@ -72,9 +72,7 @@ export default function AnalysisPage() {
     };
 
     run();
-
   }, [file]);
-
 
   if (loading) {
     return (

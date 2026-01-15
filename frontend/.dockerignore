@@ -1,0 +1,18 @@
+# Node dependencies
+node_modules
+
+# Next.js build output
+.next
+
+# Git
+.git
+.gitignore
+
+
+# Tests & coverage
+coverage
+*.spec.js
+*.test.js
+
+# Misc
+*.md
