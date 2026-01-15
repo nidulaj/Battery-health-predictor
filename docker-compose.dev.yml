@@ -1,0 +1,13 @@
+services:
+  backend:
+    volumes:
+      - ./backend:/app
+    environment:
+      FLASK_ENV: development
+
+  frontend:
+    env_file:
+      - ./frontend/.env
+    volumes:
+      - ./frontend:/app
+    command: npm run dev

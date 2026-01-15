@@ -1,0 +1,7 @@
+services:
+  backend:
+    restart: always
+
+  frontend:
+    env_file:
+      - ./frontend/.env.prod

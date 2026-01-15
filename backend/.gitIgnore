@@ -1,0 +1,8 @@
+#Raw data files
+data/raw
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
