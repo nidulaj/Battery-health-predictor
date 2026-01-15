@@ -1,0 +1,9 @@
+#Raw data
+data/
+
+#Notebooks
+notebooks/
+
+#models
+models/scaler.pkl
+models/battery_health_model.pkl
