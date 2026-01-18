@@ -3,5 +3,5 @@ services:
     restart: always
 
   frontend:
-    env_file:
-      - ./frontend/.env.prod
+    environment:
+      API_INTERNAL_URL: ${API_INTERNAL_URL}

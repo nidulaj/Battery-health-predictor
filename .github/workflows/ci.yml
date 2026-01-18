@@ -9,6 +9,9 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
 
+    .env:
+      API_INTERNAL_URL: ${{ secrets.API_INTERNAL_URL }}
+
     steps:
       #step 1: checkout code
       - name: Checkout repository
@@ -21,7 +24,7 @@ jobs:
       #step 3: Build images using base + prod config
       - name: Build Docker image
         run: |
-          docker-compose \
+          docker compose \
             -f docker-compose.yml \
             -f docker-compose.prod.yml \
             build
@@ -29,7 +32,7 @@ jobs:
       #step 4: Start backend container
       - name: Start backend container
         run: |
-          docker-compose \
+          docker compose \
             -f docker-compose.yml \
             -f docker-compose.prod.yml \
             up -d backend
