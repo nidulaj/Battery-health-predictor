@@ -9,7 +9,7 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
 
-    .env:
+    env:
       API_INTERNAL_URL: ${{ secrets.API_INTERNAL_URL }}
 
     steps:
