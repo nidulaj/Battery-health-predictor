@@ -21,7 +21,7 @@ jobs:
       #step 3: Build images using base + prod config
       - name: Build Docker image
         run: |
-          docker-compose \
+          docker compose \
             -f docker-compose.yml \
             -f docker-compose.prod.yml \
             build
@@ -29,7 +29,7 @@ jobs:
       #step 4: Start backend container
       - name: Start backend container
         run: |
-          docker-compose \
+          docker compose \
             -f docker-compose.yml \
             -f docker-compose.prod.yml \
             up -d backend
