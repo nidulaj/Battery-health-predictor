@@ -9,6 +9,9 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
 
+    .env:
+      API_INTERNAL_URL: ${{ secrets.API_INTERNAL_URL }}
+
     steps:
       #step 1: checkout code
       - name: Checkout repository
