@@ -13,8 +13,7 @@ The system uses engineered electrical and thermal features from time-series CSV 
 - ⚙️ Advanced feature engineering (thermal stress, voltage drop, discharge intensity)
 - 🌐 Full-stack app with **Next.js frontend + Flask backend**
 - 🐳 Dockerized backend & frontend
-- 🔄 CI/CD pipeline with **GitHub Actions**
-- ☁️ Deployed using **Vercel (Frontend)** & **Render (Backend)**
+- 🔄 CI pipeline with **GitHub Actions**
 
 ---
 
@@ -97,8 +96,6 @@ Battery-health-predictor/
 ### DevOps
 - **Docker & Docker Compose**
 - **GitHub Actions** (CI)
-- **Vercel** (Frontend CD)
-- **Render** (Backend CD)
 
 ---
 
@@ -143,4 +140,5 @@ docker-compose -f docker-compose.dev.yml up --build
     * ⚠️ **Moderate**
     * 🟠 **Degraded**
     * 🚨 **Replace Soon**
+
 
