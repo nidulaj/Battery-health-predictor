@@ -6,21 +6,24 @@ interface BatteryHealthScoreProps {
 }
 
 export default function BatteryHealthScore({ score, status }: BatteryHealthScoreProps) {
+  // Ensure score is a valid number, default to 0 if undefined/null/NaN
+  const validScore = typeof score === 'number' && !isNaN(score) ? score : 0;
+
   const getGradientColor = () => {
-    if (score >= 80) return "from-green-400 to-emerald-500";
-    if (score >= 60) return "from-yellow-400 to-orange-500";
+    if (validScore >= 80) return "from-green-400 to-emerald-500";
+    if (validScore >= 60) return "from-yellow-400 to-orange-500";
     return "from-red-400 to-rose-500";
   };
 
   const getStatusColor = () => {
-    if (score >= 80) return "text-green-400";
-    if (score >= 60) return "text-yellow-400";
+    if (validScore >= 80) return "text-green-400";
+    if (validScore >= 60) return "text-yellow-400";
     return "text-red-400";
   };
 
   // Calculate the stroke-dasharray and offset for the circular progress
   const circumference = 2 * Math.PI * 90; // radius = 90
-  const offset = circumference - (score / 100) * circumference;
+  const offset = circumference - (validScore / 100) * circumference;
 
   return (
     <div className="bg-gradient-to-br from-indigo-950/80 to-purple-950/80 backdrop-blur-lg border border-purple-400/20 rounded-3xl p-6 animate-[scaleIn_0.6s_ease-out]">
@@ -71,10 +74,10 @@ export default function BatteryHealthScore({ score, status }: BatteryHealthScore
         {/* Center content */}
         <div className="absolute inset-0 flex flex-col items-center justify-center">
           <div className="text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-orange-400 to-amber-500 mb-2">
-            {score}%
+            {validScore}%
           </div>
           <div className={`text-xl font-medium ${getStatusColor()}`}>
-            {status}
+            {status || 'Loading...'}
           </div>
         </div>
       </div>

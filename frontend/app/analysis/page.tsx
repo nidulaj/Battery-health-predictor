@@ -157,7 +157,7 @@ export default function AnalysisPage() {
         {/* Top Section: Health Score and Metrics */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
           {/* Battery Health Score */}
-          {health !== null && (
+          {health !== null && health !== undefined && !isNaN(health) && (
             <BatteryHealthScore score={Math.round(health)} status={status} />
           )}
 

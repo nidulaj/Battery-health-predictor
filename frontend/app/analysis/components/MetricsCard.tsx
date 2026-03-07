@@ -120,7 +120,9 @@ export default function MetricsCard({ title, value, unit, icon, gradient }: Metr
 
       {/* Value */}
       <div className="flex items-baseline gap-1">
-        <span className="text-3xl font-bold text-white">{value.toFixed(2)}</span>
+        <span className="text-3xl font-bold text-white">
+          {value !== undefined && value !== null && !isNaN(value) ? value.toFixed(2) : '0.00'}
+        </span>
         <span className="text-lg font-semibold text-purple-200">{unit}</span>
       </div>
 
